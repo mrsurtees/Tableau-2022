@@ -130,6 +130,7 @@ $installersArray =@('c:\temp\TableauPrep-2022-4-2.exe','c:\temp\TableauDesktop-6
 
 # For the necessary parameters received from other functions
 # downloadFilesHashes
+#
 
 try {
         Invoke-WebRequest $installersArray[4] -OutFile $installersArray[0]
