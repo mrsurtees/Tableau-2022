@@ -1,5 +1,5 @@
 $ProgressPreference = "SilentlyContinue"
-
+ 
 Clear-Host
 copy-item "./*.csv" "c:\temp\installersArray.csv"
 $VerbosePreference = "Continue"
