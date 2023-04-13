@@ -24,6 +24,8 @@ function WriteTo-UDF {
 
     }
 
+
+
     $udfName = 'Custom' + $UdfNumber.ToString()
     $Result = New-ItemProperty -Path "HKLM:\SOFTWARE\CentraStage" -Name $udfName -PropertyType 'String' -Value $UdfMessage
 
