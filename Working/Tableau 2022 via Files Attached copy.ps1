@@ -1,6 +1,7 @@
-Copy-Item "./*.*" "c:\temp"
+copy-item "./*.*" "c:\temp"
 Clear-Host
-$VerbosePreference = "Continue"
+$VerbosePreference  = "Continue"
+$ProgressPreference = "SilentlyContinue"
 #%%%%%%%%%%%%%%%%%%
 #      Start       #
 # PURPOSE: reads in a csv with headings of "path, hash, name, url".  With these
@@ -24,7 +25,7 @@ function WriteTo-UDF {
     }
 
     $udfName = 'Custom' + $UdfNumber.ToString()
-    $Result = New-ItemProperty -Path "HKLM:\SOFTWARE\CentraStage" -Name $udfName -PropertyType 'String' -Value $UdfMessage
+    $Result  = New-ItemProperty -Path "HKLM:\SOFTWARE\CentraStage" -Name $udfName -PropertyType 'String' -Value $UdfMessage
 
 }
 
@@ -54,13 +55,13 @@ function Delete-OldTableauPrep {
 if (-not (Test-Path "c:\temp")) {
     New-Item -Path "C:\Temp" -ItemType Directory -Force
 }
-Copy-Item "./*.*" "c:\temp"
+copy-item "./*.*" "c:\temp"
 function Get-LoggedInUser {
     $AntecedentRegex = '.+Name = "(.+)".+Domain = "(.+)"'
-    $DependentRegex = '.+LogonId = "(\d+)"'
+    $DependentRegex  = '.+LogonId = "(\d+)"'
 
     $LoggedOnUsers = [System.Collections.Generic.List[PsCustomObject]]::New()
-    $SessionUser = @{}
+    $SessionUser   = @{}
 
     $LogonType = @{
         "0"  = "Local System"
@@ -76,12 +77,13 @@ function Get-LoggedInUser {
     }
 
     $LogonSessions = @(Get-CimInstance -Class Win32_LogonSession)
-    $LogonUsers = @(Get-CimInstance -Class Win32_LoggedOnUser)
+    $LogonUsers    = @(Get-CimInstance -Class Win32_LoggedOnUser)
+
     foreach ($User in $LogonUsers) {
         $User.antecedent -match $AntecedentRegex > $nul
         $UserName = $matches[2] + "\" + $matches[1]
         $User.dependent -match $DependentRegex > $nul
-        $session = $matches[1]
+        $session                = $matches[1]
         $sessionUser[$session] += $UserName
     }
 
@@ -108,9 +110,9 @@ function Get-LoggedInUser {
 $liu = Get-LoggedInUser
 
 ###$userID needs to be error checked since issues are possible
-$userID = $liu.split("\")[1]
-$user = New-Object System.Security.Principal.NTAccount($liu)
-$userSID = $user.Translate([System.Security.Principal.SecurityIdentifier])
+$userID     = $liu.split("\")[1]
+$user       = New-Object System.Security.Principal.NTAccount($liu)
+$userSID    = $user.Translate([System.Security.Principal.SecurityIdentifier])
 $UdfContent = ""
 
 #Ensure there is a user logged in; abort execution if not
@@ -123,28 +125,28 @@ if ($userID -like "") {
 }
 
 ########################### BELOW ADDED 3/28 - MANUAL ARRAY ###########################
-$installersArray = @('c:\temp\TableauPrep-2022-4-2.exe', 'c:\temp\TableauDesktop-64bit-2022-4-1.exe', 'D200F6260D6360D54A71F4EE386A56FF6585DABBFD814474B340DF0F23479B7E', 'C63EC3AB246FDC19D89067C62F4F0078BBB0E3B7DE939A882D2901E7E9554E93', 'https://www.dropbox.com/s/exfw81rfls36fx0/TableauPrep-2022-4-2.exe?dl=1', 'https://www.dropbox.com/s/8zudwecv3jhd8wb/TableauDesktop-64bit-2022-4-1.exe?dl=1')
+$installersArray = @('c:\temp\TableauPrep-2022-4-2.exe','c:\temp\TableauDesktop-64bit-2022-4-1.exe','D200F6260D6360D54A71F4EE386A56FF6585DABBFD814474B340DF0F23479B7E','C63EC3AB246FDC19D89067C62F4F0078BBB0E3B7DE939A882D2901E7E9554E93','https://www.dropbox.com/s/exfw81rfls36fx0/TableauPrep-2022-4-2.exe?dl=1','https://www.dropbox.com/s/8zudwecv3jhd8wb/TableauDesktop-64bit-2022-4-1.exe?dl=1')
 
 # For the necessary parameters received from other functions
 # downloadFilesHashes
 
 try {
-    #Invoke-WebRequest $installersArray[4] -OutFile $installersArray[0]
-    $UdfContent += "_IVWR:Invoke OK|"
-} catch {
-    WriteTo-UDF -UdfNumber 15 -UdfMessage "Invoke-WebRequest Failed. We stop."
-    Write-Error -Message "Invoke-WebRequest Failed. Installation Archive not downloaded." -Category OpenError -ErrorAction Stop
-    $UdfContent += "_IVWR:Invoke ERROR|"
-}
+        #Invoke-WebRequest $installersArray[4] -OutFile $installersArray[0]
+        $UdfContent += "_IVWR:Invoke OK|"
+    } catch {
+        WriteTo-UDF -UdfNumber 15 -UdfMessage "Invoke-WebRequest Failed. We stop."
+        Write-Error -Message "Invoke-WebRequest Failed. Installation Archive not downloaded." -Category OpenError -ErrorAction Stop
+        $UdfContent += "_IVWR:Invoke ERROR|"
+        }
 
 try {
-    #Invoke-WebRequest $installersArray[5] -OutFile $installersArray[1]
-    $UdfContent += "_IVWR:Invoke OK| "
-} catch {
-    WriteTo-UDF -UdfNumber 15 -UdfMessage "Invoke-WebRequest Failed. We stop."
-    Write-Error -Message "Invoke-WebRequest Failed. Installation Archive not downloaded." -Category OpenError -ErrorAction Stop
-    $UdfContent += "_IVWR:Invoke ERROR|"
-}
+        #Invoke-WebRequest $installersArray[5] -OutFile $installersArray[1]
+        $UdfContent += "_IVWR:Invoke OK| "
+    } catch {
+        WriteTo-UDF -UdfNumber 15 -UdfMessage "Invoke-WebRequest Failed. We stop."
+        Write-Error -Message "Invoke-WebRequest Failed. Installation Archive not downloaded." -Category OpenError -ErrorAction Stop
+        $UdfContent += "_IVWR:Invoke ERROR|"
+    }
 
 $Hashesverify = Get-FileHash $installersArray[0]
 #write-hosts for testing
@@ -174,7 +176,7 @@ if ($Hashesverify.hash -eq $installersArray[3]) {
 ########################### ABOVE ADDED 3/28 - MANUAL ARRAY ###########################
 
 #Desktop Install
-$ExePath = 'C:\Program Files\Tableau\Tableau 2022.4\bin\tableau.exe'
+$ExePath    = 'C:\Program Files\Tableau\Tableau 2022.4\bin\tableau.exe'
 $fileExists = Test-Path $ExePath -ErrorAction continue
 if ($fileExists) {
     $UdfContent = "_Desktop:PreExisting|"
@@ -183,7 +185,7 @@ if ($fileExists) {
     Write-Verbose "Current Desktop is not installed."
 
     # Find Shortcuts
-    ForEach ($file in (Get-ChildItem "C:\users\$userID\appdata\" -Include "*tableau*.lnk" -Recurse) ) {
+    ForEach ($file in (Get-ChildItem "C:\users\$userID\appdata\" -Include "*tableau*.2021.lnk" -Recurse) ) {
 
         Remove-Item $file.FullName
     }
@@ -200,7 +202,7 @@ if ($fileExists) {
     $p.WaitForExit()
 
     $UdfContent += "_Destop:Installed "
-    $fileExists = Test-Path $ExePath
+    $fileExists  = Test-Path $ExePath
     if ($fileExists) {
         Write-Verbose "Current Desktop is installed!"
         $UdfContent = "_Desktop:NewInstall|"
@@ -213,9 +215,9 @@ if ($fileExists) {
 
 #Prep Install
 #check for existence...not there we install
-$PrepPath = "C:\Program Files\Tableau\Tableau Prep Builder 2022.4\Tableau Prep Builder.exe"
+$PrepPath   = "C:\Program Files\Tableau\Tableau Prep Builder 2022.4\Tableau Prep Builder.exe"
 $fileExists = Test-Path $PrepPath
-$p = Start-Process "C:\temp\TableauPrep-2022-4-2.exe" -ArgumentList "ACCEPTEULA=1 DESKTOPSHORTCUT=1 REMOVEINSTALLEDAPP=1 /quiet" -PassThru
+$p          = Start-Process "C:\temp\TableauPrep-2022-4-2.exe" -ArgumentList "ACCEPTEULA=1 DESKTOPSHORTCUT=1 REMOVEINSTALLEDAPP=1 /quiet" -PassThru
 $p.WaitForExit()
 if ($fileExists) {
     $UdfContent += "_Prep:PreExisting|"
@@ -273,4 +275,3 @@ $UdfContent += "_SCRIPT:DONE"
 
 #Write the final UdfContent to UDF 15
 WriteTo-UDF -UdfNumber 15 -UdfMessage $UdfContent
-#!#!#!#!#!
