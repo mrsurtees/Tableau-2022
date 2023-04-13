@@ -1,5 +1,5 @@
 $ProgressPreference = "SilentlyContinue"
- 
+
 Clear-Host
 copy-item "./*.csv" "c:\temp\installersArray.csv"
 $VerbosePreference = "Continue"
@@ -124,7 +124,7 @@ if ($userID -like "") {
 } else {
     $UdfContent += "_User:YES| "
 }
-
+<#
 ########################### BELOW ADDED 3/28 - MANUAL ARRAY ###########################
 $installersArray =@('c:\temp\TableauPrep-2022-4-2.exe','c:\temp\TableauDesktop-64bit-2022-4-1.exe','D200F6260D6360D54A71F4EE386A56FF6585DABBFD814474B340DF0F23479B7E','C63EC3AB246FDC19D89067C62F4F0078BBB0E3B7DE939A882D2901E7E9554E93','https://www.dropbox.com/s/exfw81rfls36fx0/TableauPrep-2022-4-2.exe?dl=1','https://www.dropbox.com/s/8zudwecv3jhd8wb/TableauDesktop-64bit-2022-4-1.exe?dl=1')
 
@@ -295,3 +295,4 @@ $UdfContent += "_SCRIPT:DONE"
 
 #Write the final UdfContent to UDF 15
 WriteTo-UDF -UdfNumber 15 -UdfMessage $UdfContent
+#>
