@@ -4,10 +4,10 @@ $ProgressPreference = "SilentlyContinue"
 copy-item "./*.csv" "c:\temp\installersArray.csv"
 #%%%%%%%%%%%%%%%%%%
 #      Start       #
-#      PURPOSE:  reads in a csv with headings of "path, hash, name, url".  With these 
+#      PURPOSE:  reads in a csv with headings of "path, hash, name, url".  With these
 #      populated the script will install the requested software...in this case it's
 #      for Chartis Tableau
-# 
+#
 #      Checks if latest Tableau versions are installed and, if not, installs.  Back one version is kept.
 #%%%%%%%%%%%%%%%%%%
 #all working....get error checking in place
@@ -17,11 +17,11 @@ function WriteTo-UDF {
         [Parameter(Mandatory = $true)]  [int]$UdfNumber,
         [Parameter(Mandatory = $true)]  [string]$UdfMessage
     )
- 
+
     if ($udfNumber -lt 1 -or $UdfNumber -gt 30) {
         $msg = 'Fatal Error in Script Execution\Invalid UDF Number in WriteTo-UDF function call: $($UdfNumber.ToString())'
         Write-Error -Message $msg -Category InvalidArgument -ErrorAction Stop
- 
+
     }
 
     $udfName = 'Custom' + $UdfNumber.ToString()
@@ -39,8 +39,8 @@ $liu = (Get-CimInstance -ClassName Win32_ComputerSystem).UserName
 
 ###$userID needs to be error checked since issues are possible
 $userID = $liu.split("\")[1]
-$user = New-Object System.Security.Principal.NTAccount($liu) 
-$userSID = $user.Translate([System.Security.Principal.SecurityIdentifier]) 
+$user = New-Object System.Security.Principal.NTAccount($liu)
+$userSID = $user.Translate([System.Security.Principal.SecurityIdentifier])
 $UdfContent = ""
 
 #Ensure there is a user logged in; abort execution if not
@@ -64,11 +64,11 @@ if ($userID -like "") {
 
 
 
-$Installers = Import-Csv C:\temp\installersArray.csv 
+$Installers = Import-Csv C:\temp\installersArray.csv
 foreach ($Installer in $Installers) {
 
     try {
-       invoke-WebRequest -Uri $Installer.url -OutFile $Installer.path
+       #invoke-WebRequest -Uri $Installer.url -OutFile $Installer.path
 
     } catch {
         WriteTo-UDF -UdfNumber 15 -UdfMessage "Invoke-WebRequest Failed. We stop."
@@ -85,10 +85,10 @@ foreach ($Installer in $Installers) {
         Write-Verbose "Hashes match - proceeding"
     } else {
         WriteTo-UDF -udfNumber 15 -UdfMessage "Archive Hash Mismatch"
-        Write-Error -Message "Hashes do not match - corrupt Installers Archive detected." -Category InvalidData -ErrorAction Stop 
+        Write-Error -Message "Hashes do not match - corrupt Installers Archive detected." -Category InvalidData -ErrorAction Stop
         $UdfContent += "_InHash:hash Mismatch"
-    } 
-    
+    }
+
 }
 
 #Desktop 2023 Check
@@ -102,7 +102,7 @@ if ($fileExists) {
     Write-Verbose "Current Desktop 2023.1 already installed"
     }
      else {
-    Write-Verbose "Current Desktop 2023.1 is NOT Installed....Skipping" 
+    Write-Verbose "Current Desktop 2023.1 is NOT Installed....Skipping"
     $UdfContent += "_D23:Skip|"
    }
 
@@ -114,9 +114,9 @@ if ($fileExists) {
     $UdfContent += "_D22:PreExisting"
     Write-Verbose "Current Desktop 2022.3 version already installed"}
      else {
-    Write-Verbose "Current Desktop 2022.3 is NOT Installed....installing" 
+    Write-Verbose "Current Desktop 2022.3 is NOT Installed....installing"
     $UdfContent += "_D22:Installed|"
-    $p = Start-Process "c:\temp\TableauDesktop-64bit-2022-4-2.exe" -ArgumentList "ACCEPTEULA=1 DESKTOPSHORTCUT=1 REMOVEINSTALLEDAPP=1 /repair /quiet" -PassThru
+    $p = Start-Process "c:\temp\TableauDesktop-64bit-2022-4-2.exe" -ArgumentList "ACCEPTEULA=1 DESKTOPSHORTCUT=0 REMOVEINSTALLEDAPP=1 /repair /quiet" -PassThru
     $p.WaitForExit()
     }
 
@@ -145,8 +145,8 @@ $installed = Import-Csv -Path "C:\temp\installersArray.csv"
 <#
 foreach ($i in $installed) {
     if ($i.installedhash -eq $(Get-FileHash $i.installedpath).hash) {
-        Write-Verbose "$($i.installedname) is OK:  hashes match" 
-        $UdfContent += "_InHash:YES $($i.installedName)|" 
+        Write-Verbose "$($i.installedname) is OK:  hashes match"
+        $UdfContent += "_InHash:YES $($i.installedName)|"
     } else {
         Write-Verbose "$($i.installedname) has an incorrect hash so we must stop."
         writeto-udf -udfNumber 15 "$($i.installedName) hash is incorrect so we must stop"
@@ -158,13 +158,13 @@ foreach ($i in $installed) {
 
 
 
-
-if (Test-Path "C:\temp\TableauPrep-2022-4-2.exe") 
+<#
+if (Test-Path "C:\temp\TableauPrep-2022-4-2.exe")
     {Remove-Item "C:\temp\TableauPrep-2022-4-2.exe"
     }
 if (Test-Path -path "C:\temp\TableauDesktop-64bit-2022-4-2.exe")
     {Remove-Item "C:\temp\TableauDesktop-64bit-2022-4-2.exe"}
-
+#>
 $UdfContent += "_SCRIPT:DONE"
 #Write the final UdfContent to UDF 15
 WriteTo-UDF -UdfNumber 15 -UdfMessage $UdfContent
