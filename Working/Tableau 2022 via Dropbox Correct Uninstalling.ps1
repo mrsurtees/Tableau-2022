@@ -109,7 +109,7 @@ if ($fileExists) {
 
 
 #Desktop 2022.3 Log if installed or not
-$ExePath = "C:\Program Files\Tableau\Tableau 2022.3\bin\tableau.exe"
+$ExePath    = "C:\Program Files\Tableau\Tableau 2022.3\bin\tableau.exe"
 $fileExists = Test-Path $ExePath -ErrorAction continue
 if ($fileExists) {
     $UdfContent += "_D22:PreExisting"
@@ -117,12 +117,12 @@ if ($fileExists) {
      else {
     Write-Verbose "Current Desktop 2022.3 is NOT Installed...installing"
     $UdfContent += "_D22:Installed|"
-    $p = Start-Process "C:\Temp\TableauDesktop-64bit-2022-3-5.exe" -ArgumentList "ACCEPTEULA=1 DESKTOPSHORTCUT=0 REMOVEINSTALLEDAPP=0 /repair /quiet" -PassThru
+    $p           = Start-Process "C:\Temp\TableauDesktop-64bit-2022-3-5.exe" -ArgumentList "ACCEPTEULA=1 DESKTOPSHORTCUT=0 REMOVEINSTALLEDAPP=0 /repair /quiet" -PassThru
     $p.WaitForExit()
     }
 
 
-# Check if user has Prep installed, otherwise, they don't get it
+#Check if user has Prep installed, otherwise, they don't get it
 #Are we even installing prep?
 $oldPrepRemovals = @(Get-ChildItem -Recurse -Path "C:\programdata\Package Cache" -Include "Tableau*prep*.exe")
 if ($oldPrepRemovals -like "*prep*") {
