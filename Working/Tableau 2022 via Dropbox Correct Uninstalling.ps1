@@ -122,15 +122,7 @@ if ($fileExists) {
     }
 
 
-    # Check if user has Prep installed, otherwise, they don't get it
-$oldPrepRemovals = Get-ChildItem -Recurse -Path "C:\programdata\Package Cache" -Include "Tableau*prep*.exe"
-if ($oldPrepRemovals.name -like "*prep*")
-    {write-verbose "This machine doesn't get Prep"}
-$oldPrepRemovals = "0"
-
-
-
-
+# Check if user has Prep installed, otherwise, they don't get it
 #Are we even installing prep?
 $oldPrepRemovals = @(Get-ChildItem -Recurse -Path "C:\programdata\Package Cache" -Include "Tableau*prep*.exe")
 if ($oldPrepRemovals -like "*prep*") {
@@ -190,6 +182,6 @@ WriteTo-UDF -UdfNumber 15 -UdfMessage $UdfContent
 write-verbose $UdfContent
 
 
-$getFileList = dir -Path "C:\Program Files\Tableau\"  -Filter *tabl*.exe -Recurse | %{$_.FullName}
+$getFileList = Get-ChildItem -Path "C:\Program Files\Tableau\"  -Filter *tabl*.exe -Recurse | %{$_.FullName}
 $verified = "Custom"+'16'
 New-ItemProperty -Path "HKLM:\SOFTWARE\CentraStage" -Name $verified  -PropertyType String -value  $getFileList
