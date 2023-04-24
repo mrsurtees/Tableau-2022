@@ -166,14 +166,12 @@ foreach ($i in $oldDesktopRemovals){
 ############################################################
 
 <#
-
 if (Test-Path "C:\Temp\TableauPrep-2022-4-3.exe")
     {Remove-Item "C:\temp\TableauPrep-2022-4-2.exe"
     }
 if (Test-Path -path "C:\temp\TableauDesktop-64bit-2022-4-2.exe")
     {Remove-Item "C:\Temp\TableauDesktop-64bit-2022-3-5.exe"}
-
-    #>
+#>
 
 
 $UdfContent += "_SCRIPT:DONE"
